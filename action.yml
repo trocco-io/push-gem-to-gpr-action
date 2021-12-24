@@ -1,0 +1,29 @@
+name: 'Push Gem to GPR'
+description: 'Push Gem to GitHub Packages Registry. Gem generation is required before using this action.'
+inputs:
+  gem-path:
+    description: 'gem path to publish (may be "./build/gems/*.gem" or "./pkg/*.gem")'
+    required: true
+    default: './pkg/*.gem'
+runs:
+  using: "composite"
+  steps:
+    - if: startsWith( github.ref, 'refs/heads/' )
+      name: Add branch suffix to version
+      env:
+        REF: ${{ github.ref }}
+      run: |
+        commit_hash="$(echo ${GITHUB_SHA:0:7})"
+        sed -ie "s/\(spec\.version = \"[^\"]\+\)/\1.${commit_hash}.pre/g" *.gemspec
+      shell: bash
+    - name: Publish to GPR
+      env:
+        GEM_HOST_API_KEY: "Bearer ${{secrets.GITHUB_TOKEN}}"
+        OWNER: ${{ github.repository_owner }}
+      run: |
+        mkdir -p "$HOME/.gem"
+        touch "$HOME/.gem/credentials"
+        chmod 0600 "$HOME/.gem/credentials"
+        printf -- "---\n:github: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
+        gem push --KEY github --host "https://rubygems.pkg.github.com/${OWNER}" ${{ inputs.gem-path }}
+      shell: bash

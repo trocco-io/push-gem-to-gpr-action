@@ -1,24 +1,35 @@
 name: 'Push Gem to GPR'
 description: 'Push Gem to GitHub Packages Registry. Gem generation is required before using this action.'
 inputs:
+  language:
+    description: 'plugin language: java or ruby'
+    required: true
+    default: ruby
   gem-path:
     description: 'gem path to publish (may be "./build/gems/*.gem" for jruby or "./pkg/*.gem" for ruby)'
     required: true
     default: './pkg/*.gem'
   github-token:
-    description: 'please pass secrets.GITHUB_TOKEN from your workflow YAML to publish gem to GPR'
+    description: 'please set secrets.GITHUB_TOKEN from your workflow YAML to publish gem to GPR'
     required: true
 runs:
   using: "composite"
   steps:
-    - if: startsWith( github.ref, 'refs/heads/' )
-      name: Add branch suffix to version
+    - if: ${{ inputs.language == 'ruby' && startsWith( github.ref, 'refs/heads/' )}}
+      name: Add branch suffix to version and build gem
       env:
         REF: ${{ github.ref }}
       run: |
         commit_hash="$(echo ${GITHUB_SHA:0:7})"
         sed -ie "s/\(spec\.version = \"[^\"]\+\)/\1.${commit_hash}.pre/g" *.gemspec
         grep spec.version *.gemspec
+        rake build
+      shell: bash
+    - if: ${{ inputs.language == 'java' }}
+      name: build gem
+      run: |
+        ./gradlew printVersion
+        ./gradlew gem
       shell: bash
     - name: Publish to GPR
       env:

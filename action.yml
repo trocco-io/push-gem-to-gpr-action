@@ -2,9 +2,12 @@ name: 'Push Gem to GPR'
 description: 'Push Gem to GitHub Packages Registry. Gem generation is required before using this action.'
 inputs:
   gem-path:
-    description: 'gem path to publish (may be "./build/gems/*.gem" or "./pkg/*.gem")'
+    description: 'gem path to publish (may be "./build/gems/*.gem" for jruby or "./pkg/*.gem" for ruby)'
     required: true
     default: './pkg/*.gem'
+  github-token:
+    description: 'please pass secrets.GITHUB_TOKEN from your workflow YAML to publish gem to GPR'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -18,7 +21,7 @@ runs:
       shell: bash
     - name: Publish to GPR
       env:
-        GEM_HOST_API_KEY: "Bearer ${{secrets.GITHUB_TOKEN}}"
+        GEM_HOST_API_KEY: "Bearer ${{ inputs.GITHUB_TOKEN }}"
         OWNER: ${{ github.repository_owner }}
       run: |
         mkdir -p "$HOME/.gem"

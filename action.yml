@@ -24,7 +24,7 @@ runs:
         sed -ie "s/\(spec\.version = \"[^\"]\+\)/\1.${commit_hash}.pre/g" *.gemspec
         grep spec.version *.gemspec
       shell: bash
-    - if: ${{ inputs.language == 'ruby' )}}
+    - if: ${{ inputs.language == 'ruby' }}
       name: Build gem with ruby
       run: rake build
       shell: bash

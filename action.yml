@@ -21,7 +21,7 @@ runs:
       shell: bash
     - name: Publish to GPR
       env:
-        GEM_HOST_API_KEY: "Bearer ${{ inputs.GITHUB_TOKEN }}"
+        GEM_HOST_API_KEY: "Bearer ${{ inputs.github-token }}"
         OWNER: ${{ github.repository_owner }}
       run: |
         mkdir -p "$HOME/.gem"

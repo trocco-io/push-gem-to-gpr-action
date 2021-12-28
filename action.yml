@@ -18,6 +18,7 @@ runs:
       run: |
         commit_hash="$(echo ${GITHUB_SHA:0:7})"
         sed -ie "s/\(spec\.version = \"[^\"]\+\)/\1.${commit_hash}.pre/g" *.gemspec
+        grep spec.version *.gemspec
       shell: bash
     - name: Publish to GPR
       env:

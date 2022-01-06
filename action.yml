@@ -1,5 +1,5 @@
 name: 'Push Gem to GPR'
-description: 'Push Gem to GitHub Packages Registry. Gem generation is required before using this action.'
+description: 'Push Gem to GitHub Packages Registry'
 inputs:
   language:
     description: 'plugin language: java or ruby'

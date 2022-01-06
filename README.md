@@ -1,6 +1,6 @@
 # push-gem-to-gpr-action
 
-GitHub Package Registry に Gem を Publish する GitHub Action です。
+GitHub Package Registry に Gem を Publish する GitHub Action です。  
 Release 経由でのトリガーなど、GitHub Ref が `refs/heads/tag` の形になっている場合は記述されている通りのバージョンで Push されます。
 
 それ以外のケース (`workflow_dispatch`による手動実行など) では、以下のような挙動となります。

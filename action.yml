@@ -12,6 +12,10 @@ inputs:
   github-token:
     description: 'please set secrets.GITHUB_TOKEN from your workflow YAML to publish gem to GPR'
     required: true
+  gradle-subproject:
+    description: 'gradle subproject name'
+    required: false
+    default: ''
 runs:
   using: "composite"
   steps:
@@ -28,11 +32,17 @@ runs:
       name: Build gem with ruby
       run: rake build
       shell: bash
-    - if: ${{ inputs.language == 'java' }}
+    - if: ${{ inputs.language == 'java' && inputs.gradle-subproject == '' }}
       name: Build gem with Java
       run: |
         ./gradlew printVersion
         ./gradlew gem
+      shell: bash
+    - if: ${{ inputs.language == 'java' && inputs.gradle-subproject != ''}}
+      name: Build gem with Java subproject
+      run: |
+        ./gradlew :${{ inputs.gradle-subproject }}:printVersion
+        ./gradlew :${{ inputs.gradle-subproject }}:gem
       shell: bash
     - name: Publish to GPR
       env:

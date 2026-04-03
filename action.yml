@@ -40,18 +40,21 @@ runs:
       shell: bash
     - if: ${{ inputs.language == 'java' && inputs.gradle-subproject != ''}}
       name: Build gem with Java subproject
+      env:
+        GRADLE_SUBPROJECT: ${{ inputs.gradle-subproject }}
       run: |
-        ./gradlew :${{ inputs.gradle-subproject }}:printVersion
-        ./gradlew :${{ inputs.gradle-subproject }}:gem
+        ./gradlew ":${GRADLE_SUBPROJECT}:printVersion"
+        ./gradlew ":${GRADLE_SUBPROJECT}:gem"
       shell: bash
     - name: Publish to GPR
       env:
         GEM_HOST_API_KEY: "Bearer ${{ inputs.github-token }}"
         OWNER: ${{ github.repository_owner }}
+        GEM_PATH: ${{ inputs.gem-path }}
       run: |
         mkdir -p "$HOME/.gem"
         touch "$HOME/.gem/credentials"
         chmod 0600 "$HOME/.gem/credentials"
         printf -- "---\n:github: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
-        gem push --KEY github --host "https://rubygems.pkg.github.com/${OWNER}" ${{ inputs.gem-path }}
+        gem push --KEY github --host "https://rubygems.pkg.github.com/${OWNER}" ${GEM_PATH}
       shell: bash
